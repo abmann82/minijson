@@ -1,7 +1,20 @@
 minijson
 ========
 
-Low-dependency JSON parser for C++
+Minijson is a low dependeny, easy to use json parser and writer. Minijson works with all common compilers and is tested and used on the following platforms:
+
+* Linux (gcc)
+* OSX (clang)
+* iOS
+* Android
+* Windows (visual c++)
+* Windows Phone 8 (and newer)
+
+Usage:
+
+Download or clone the source files and add minijson.h and minijson.cpp to your project. 
+
+Examples:
 
 minijson parse example:
 
