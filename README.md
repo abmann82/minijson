@@ -25,9 +25,10 @@ minijson parse example:
     {
         const char* JSON = " { \"test\":[\"a\", 1, false ] } ";
         
+        CEntity* json = nullptr;
         try 
         {
-            CEntity* json = CParser::ParseString(JSON);
+            json = CParser::ParseString(JSON);
             minijson::CObject& obj = json->Object();
             std::string str = obj["test"][0].StringValue();
             int i = obj["test"][1].IntValue();
@@ -38,4 +39,5 @@ minijson parse example:
             printf("Json error: %s\n", e.Message().c_str());
             exit(1);
         }
+        delete json;
     }
