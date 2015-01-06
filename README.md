@@ -19,13 +19,16 @@ Examples:
 minijson parse example:
 
     #include "minijson.h"
+    #include <stdlib.h>
+    #include <stdio.h>
+    
     using namespace minijson;
     
     int main(int argc, char* argv[])
     {
         const char* JSON = " { \"test\":[\"a\", 1, false ] } ";
         
-        CEntity* json = nullptr;
+        CEntity* json = NULL;
         try 
         {
             json = CParser::ParseString(JSON);
