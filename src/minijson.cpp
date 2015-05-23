@@ -266,6 +266,14 @@ int CEntity::IntValue() const
 {
     return atoi(Number().Value().c_str());
 }
+float CEntity::FloatValue() const
+{
+    return DoubleValue();
+}
+double CEntity::DoubleValue() const
+{
+    return atof(Number().Value().c_str());
+}
 bool CEntity::BoolValue() const
 {
     return Boolean().Value();

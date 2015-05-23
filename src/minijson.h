@@ -88,6 +88,7 @@ public:
     virtual int Count() const;
     const std::string& StringValue() const;
     float FloatValue() const;
+    double DoubleValue() const;
     int IntValue() const;
     bool BoolValue() const;
 
