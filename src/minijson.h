@@ -105,6 +105,7 @@ public:
     CEntity& operator[] (const std::string& key);
 
     virtual std::string ToString(bool prettyPrint = true, const std::string& indentation = std::string("  "), int level = 0) const = 0;
+    virtual CEntity* Copy() const = 0;
 protected:
     static std::string s_EmptyString;
 
@@ -157,6 +158,8 @@ public:
     const CEntity& EntityAtIndex(int idx) const;
 
     virtual std::string ToString(bool prettyPrint = true, const std::string& indentation = std::string("  "), int level = 0) const MINIJSON_OVERRIDE;
+    virtual CEntity* Copy() const MINIJSON_OVERRIDE;
+    void MergeFrom(const CObject& obj, bool overwrite);
 
 private:
     std::map<std::string, CEntity*> m_Values;
@@ -193,6 +196,7 @@ public:
     CNull* GetNull(int index) const;
 
     virtual std::string ToString(bool prettyPrint = true, const std::string& indentation = std::string("  "), int level = 0) const MINIJSON_OVERRIDE;
+    virtual CEntity* Copy() const MINIJSON_OVERRIDE;
 
     virtual int Count() const MINIJSON_OVERRIDE{ return (int)m_Values.size(); }
     CEntity& EntityAtIndex(int index);
@@ -212,6 +216,7 @@ public:
     void SetString(const std::string& str);
 
     virtual std::string ToString(bool prettyPrint = true, const std::string& indentation = std::string("  "), int level = 0) const MINIJSON_OVERRIDE;
+    virtual CEntity* Copy() const MINIJSON_OVERRIDE;
 
     const std::string& Value() const { return m_Value; }
 
@@ -232,6 +237,7 @@ public:
     void SetString(const std::string& num);
 
     virtual std::string ToString(bool prettyPrint = true, const std::string& indentation = std::string("  "), int level = 0) const MINIJSON_OVERRIDE;
+    virtual CEntity* Copy() const MINIJSON_OVERRIDE;
 
     const std::string& Value() const { return m_Number; }
     int ValueInt() const;
@@ -251,6 +257,7 @@ public:
     void SetBool(bool b);
 
     virtual std::string ToString(bool prettyPrint = true, const std::string& indentation = std::string("  "), int level = 0) const MINIJSON_OVERRIDE;
+    virtual CEntity* Copy() const MINIJSON_OVERRIDE;
 
     bool Value() const { return m_Value; }
 private:
@@ -265,6 +272,7 @@ public:
     virtual ~CNull();
 
     virtual std::string ToString(bool prettyPrint = true, const std::string& indentation = std::string("  "), int level = 0) const MINIJSON_OVERRIDE;
+    virtual CEntity* Copy() const MINIJSON_OVERRIDE;
 
 private:
     friend class CParser;

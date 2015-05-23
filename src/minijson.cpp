@@ -418,6 +418,13 @@ std::string CNumber::ToString(bool prettyPrint, const std::string& indentation, 
     return m_Number;
 }
 
+CEntity* CNumber::Copy() const
+{
+    CNumber* copy = new CNumber();
+    copy->m_Number = m_Number;
+    return copy;
+}
+
 CString::CString()
 {
 }
@@ -440,6 +447,13 @@ std::string CString::ToString(bool prettyPrint, const std::string& indentation, 
     s += "\"";
     return s;
 }
+CEntity* CString::Copy() const
+{
+    CString* copy = new CString();
+    copy->m_Value = m_Value;
+    return copy;
+}
+
 CArray::CArray()
 {
 }
@@ -640,6 +654,19 @@ const CEntity& CArray::EntityAtIndex(int index) const
 {
     return *m_Values[index];
 }
+
+CEntity* CArray::Copy() const
+{
+    CArray* copy = new CArray();
+    copy->m_Values.resize(m_Values.size());
+    for (std::size_t i = 0; i < m_Values.size(); i++)
+    {
+        CEntity* e = m_Values[i]->Copy();
+        copy->m_Values[i] = e;
+    }
+    return copy;
+}
+
 
 CObject::CObject()
 {
@@ -930,6 +957,39 @@ bool CObject::Remove(const char* name)
     delete ent;
     return true;
 }
+CEntity* CObject::Copy() const
+{
+    CObject* copy = new CObject();
+    for (std::map<std::string, CEntity*>::const_iterator it = m_Values.begin(); it != m_Values.end(); ++it)
+    {
+        CEntity* e = it->second->Copy();
+        copy->m_Values[it->first] = e;
+    }
+    copy->m_MemberNameByIndex = m_MemberNameByIndex;
+    return copy;
+}
+void CObject::MergeFrom(const CObject& obj, bool overwrite)
+{
+    for (std::map<std::string, CEntity*>::const_iterator it = obj.m_Values.begin(); it != obj.m_Values.end(); ++it)
+    {
+        const std::string& key = it->first;
+        if (Contains(key.c_str()))
+        {
+            if (!overwrite)
+            {
+                continue;
+            }
+            delete m_Values[key];
+        }
+        else
+        {
+            m_MemberNameByIndex.push_back(key);
+        }
+        m_Values[key] = it->second->Copy();
+    }
+}
+
+
 CBoolean::CBoolean()
     : m_Value(false)
 {
@@ -945,6 +1005,13 @@ std::string CBoolean::ToString(bool prettyPrint, const std::string& indentation,
 {
     return m_Value ? std::string("true") : std::string("false");
 }
+CEntity* CBoolean::Copy() const
+{
+    CBoolean* copy = new CBoolean();
+    copy->m_Value = m_Value;
+    return copy;
+}
+
 CNull::CNull()
 {
 }
@@ -954,6 +1021,10 @@ CNull::~CNull()
 std::string CNull::ToString(bool prettyPrint, const std::string& indentation, int level) const
 {
     return std::string("null");
+}
+CEntity* CNull::Copy() const
+{
+    return new CNull();
 }
 
 
