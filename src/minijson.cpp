@@ -121,21 +121,41 @@ CParseErrorException::~CParseErrorException()
 
 static std::string EscapeString(const std::string& str)
 {
-    std::string s = str;
-    std::size_t idx = s.find("\"");
-    while (idx != std::string::npos)
+    int escapeCount = 0;
+    for (int i = 0; i < str.length(); i++)
     {
-        s.replace(idx, 1, "\\\"");
-        idx = s.find("\"", idx+2);
+        char c = str[i];
+        if (c == '\b' ||
+            c == '\r' ||
+            c == '\n' ||
+            c == '\f' ||
+            c == '\t' ||
+            c == '\\' ||
+            c == '/' ||
+            c == '\"')
+        {
+            escapeCount++;
+        }
     }
-    idx = s.find("\n");
-    while (idx != std::string::npos)
+    std::string out;
+    out.reserve(str.length() + escapeCount);
+    for (int i = 0; i < str.length(); i++)
     {
-        s.replace(idx, 1, "\\n");
-        idx = s.find("\n", idx+2);
+        char c = str[i];
+        switch (c)
+        {
+        case '\b': out += "\\b"; break;
+        case '\r': out += "\\r"; break;
+        case '\n': out += "\\n"; break;
+        case '\f': out += "\\f"; break;
+        case '\t': out += "\\t"; break;
+        case '\\': out += "\\\\"; break;
+        case '/': out += "\\/"; break;
+        case '\"': out += "\\\""; break;
+        default: out += c;
+        }
     }
-
-    return s;
+    return out;
 }
 
 CEntity::CEntity()
@@ -1109,6 +1129,22 @@ std::string CParser::ParseStringLiteral()
         {
             m_Position++;
             c = m_Text[m_Position];
+            switch (c)
+            {
+            case 'b': c = '\b'; break;
+            case 'r': c = '\r'; break;
+            case 'n': c = '\n'; break;
+            case 'f': c = '\f'; break;
+            case 't': c = '\t'; break;
+            case '\\': c = '\\'; break;
+            case '/': c = '/'; break;
+            case '\"': c = '\"'; break;
+            case 'u':
+                {
+                    // FIXME
+                }
+                break;
+            }
         }
         str += c;
         m_Position++;
