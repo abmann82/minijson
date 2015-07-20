@@ -122,7 +122,7 @@ CParseErrorException::~CParseErrorException()
 static std::string EscapeString(const std::string& str)
 {
     int escapeCount = 0;
-    for (int i = 0; i < str.length(); i++)
+    for (std::string::size_type i = 0; i < str.length(); i++)
     {
         char c = str[i];
         if (c == '\b' ||
@@ -139,7 +139,7 @@ static std::string EscapeString(const std::string& str)
     }
     std::string out;
     out.reserve(str.length() + escapeCount);
-    for (int i = 0; i < str.length(); i++)
+    for (std::string::size_type i = 0; i < str.length(); i++)
     {
         char c = str[i];
         switch (c)
