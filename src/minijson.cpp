@@ -1109,6 +1109,28 @@ void CParser::ConsumeOrDie(const char* txt)
     }
 }
 
+static int WriteUTF8Chars(char* buf, short unsigned int c)
+{
+    if (c < 128)
+    {
+        buf[0] = c;
+        return 1;
+    }
+    else if (c < 2048)
+    {
+        buf[0] = 0xc0 | ((c >> 6) & 0xff);
+        buf[1] = 0x80 | (c & 63);
+        return 2;
+    }
+    else
+    {
+        buf[0] = 0xe0 | ((c >> 12) & 0xff);
+        buf[1] = 0x80 | ((c >> 6)  & 63);
+        buf[2] = 0x80 | (c & 63);
+        return 3;
+    }
+}
+
 // NOTE: does NOT support empty strings, caller needs to check that!
 std::string CParser::ParseStringLiteral()
 {
@@ -1141,7 +1163,23 @@ std::string CParser::ParseStringLiteral()
             case '\"': c = '\"'; break;
             case 'u':
                 {
-                    // FIXME
+                    m_Position++;
+                    if (m_Position + 4 > m_Length)
+                    {
+                        throw CParseErrorException(m_Text, origPos, "Invalid \\u escaping");
+                    }
+                    char buf[5];
+                    memcpy(buf, &m_Text[m_Position], 4);
+                    buf[4] = 0;
+                    int utf8Char = (int)strtol(buf, nullptr, 16);
+                    char utf8Buf[16];
+                    int len = WriteUTF8Chars(utf8Buf, utf8Char);
+                    for (int i = 0; i < len-1; i++)
+                    {
+                        str += utf8Buf[i];
+                    }
+                    c = utf8Buf[len-1];
+                    m_Position += 3;
                 }
                 break;
             }
