@@ -41,12 +41,28 @@ INSTANTIATE_TEST_CASE_P(
             MiniJSONStringTestParam("\"123\"", std::string("123")),
 
             // simple string, spaces in value
-            MiniJSONStringTestParam(" { \"123 \" ", std::string("123 ")),
-            MiniJSONStringTestParam(" { \" 123 \" ", std::string(" 123 ")),
-            MiniJSONStringTestParam(" { \" 1 2 3 \" ", std::string(" 1 2 3 ")),
+            MiniJSONStringTestParam(" \"123 \" ", std::string("123 ")),
+            MiniJSONStringTestParam(" \" 123 \" ", std::string(" 123 ")),
+            MiniJSONStringTestParam(" \" 1 2 3 \" ", std::string(" 1 2 3 ")),
 
             // simple string, umlauts in value
-            MiniJSONStringTestParam(" { \"öäü\" ", std::string("öäü"))
+            MiniJSONStringTestParam(" \"öäü\" ", std::string("öäü")),
+
+            // simple string, newline in value (not valid JSON, non-strict mode should accept it)
+            MiniJSONStringTestParam(" \"foo\" : \" 1 \n 2 \" ", std::string(" 1 \n 2 ")),
+
+            // simple string, escaped newline in value
+            MiniJSONStringTestParam(" \"foo\" : \" 1 \\n 2 \" ", std::string(" 1 \n 2 ")),
+
+            // simple string, unicode representation of single character (see RFC7159)
+            MiniJSONStringTestParam(" \"foo\" : \" \\u0041 \" ", std::string(" A ")),
+            MiniJSONStringTestParam(" \"foo\" : \" \\u005c \" ", std::string(" \\ ")),
+            MiniJSONStringTestParam(" \"foo\" : \" \\u005C \" ", std::string(" \\ ")),
+            MiniJSONStringTestParam(" \"foo\" : \" \\u00F6 \" ", std::string(" ö ")),
+            MiniJSONStringTestParam(" \"foo\" : \" \\u00f6 \" ", std::string(" ö ")),
+            MiniJSONStringTestParam(" \"foo\" : \" \\u0444 \" ", std::string(" ф ")),
+            MiniJSONStringTestParam(" \"foo\" : \" \\u13DB \" ", std::string(" Ꮫ ")),
+            MiniJSONStringTestParam(" \"foo\" : \" \\u13db \" ", std::string(" Ꮫ "))
         )
 );
 
@@ -108,7 +124,23 @@ INSTANTIATE_TEST_CASE_P(
             MiniJSONObjectValueTestParam(" { \"foo\" : \" 1 2 3 \" } ", "foo", std::string(" 1 2 3 ")),
 
             // simple object/string, umlauts in value
-            MiniJSONObjectValueTestParam(" { \"foo\" : \"öäü\" } ", "foo", std::string("öäü"))
+            MiniJSONObjectValueTestParam(" { \"foo\" : \"öäü\" } ", "foo", std::string("öäü")),
+
+            // simple object/string, newline in value (not valid JSON, non-strict mode should accept it)
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" 1 \n 2 \" } ", "foo", std::string(" 1 \n 2 ")),
+
+            // simple object/string, escaped newline in value
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" 1 \\n 2 \" } ", "foo", std::string(" 1 \n 2 ")),
+
+            // simple object/string, unicode representation of single character (see RFC7159)
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" \\u0041 \" } ", "foo", std::string(" A ")),
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" \\u005c \" } ", "foo", std::string(" \\ ")),
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" \\u005C \" } ", "foo", std::string(" \\ ")),
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" \\u00F6 \" } ", "foo", std::string(" ö ")),
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" \\u00f6 \" } ", "foo", std::string(" ö ")),
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" \\u0444 \" } ", "foo", std::string(" ф ")),
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" \\u13DB \" } ", "foo", std::string(" Ꮫ ")),
+            MiniJSONObjectValueTestParam(" { \"foo\" : \" \\u13db \" } ", "foo", std::string(" Ꮫ "))
         )
 );
 
