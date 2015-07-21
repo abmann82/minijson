@@ -12,7 +12,7 @@ struct MiniJSONStringTestParam
         : m_Txt(txt), m_ExpectedString(expectedString)
     {
     }
-    const char* m_Txt = NULL;
+    const char* m_Txt;
     std::string m_ExpectedString;
 };
 class MiniJSONStringTest : public ::testing::TestWithParam<MiniJSONStringTestParam>
@@ -77,8 +77,8 @@ struct MiniJSONObjectValueTestParam
         : m_Txt(txt), m_Key(key), m_ExpectedValue(expectedValue)
     {
     }
-    const char* m_Txt = NULL;
-    const char* m_Key = NULL;
+    const char* m_Txt;
+    const char* m_Key;
     std::string m_ExpectedValue;
 };
 class MiniJSONObjectStringTest : public ::testing::TestWithParam<MiniJSONObjectValueTestParam>
