@@ -1171,7 +1171,7 @@ std::string CParser::ParseStringLiteral()
                     char buf[5];
                     memcpy(buf, &m_Text[m_Position], 4);
                     buf[4] = 0;
-                    int utf8Char = (int)strtol(buf, nullptr, 16);
+                    int utf8Char = (int)strtol(buf, NULL, 16);
                     char utf8Buf[16];
                     int len = WriteUTF8Chars(utf8Buf, utf8Char);
                     for (int i = 0; i < len-1; i++)
