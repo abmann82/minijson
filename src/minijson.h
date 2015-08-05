@@ -185,6 +185,8 @@ public:
     CArray();
     virtual ~CArray();
 
+    void Remove(int index);
+
     CArray* AddArray();
     CObject* AddObject();
     CNumber* AddInt(int value);
@@ -309,6 +311,10 @@ public:
         CParser p;
         return p.Parse(txt);
     }
+
+    static CEntity* ParseFromFile(const char* path);
+    static CEntity* ParseFromFile(const std::string& path);
+
 private:
     void SkipWhitespaces();
     bool TryToConsume(const char* txt);

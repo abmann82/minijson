@@ -530,6 +530,18 @@ CArray::~CArray()
     }
 }
 
+void CArray::Remove(int index)
+{
+    if (index < 0 ||
+        index >= (int)m_Values.size())
+    {
+        throw CException("index out of range");
+    }
+    CEntity* ent = m_Values[index];
+    delete ent;
+    m_Values.erase(m_Values.begin() + index);
+}
+
 CArray* CArray::AddArray()
 {
     CArray* arr = new CArray();
@@ -1470,6 +1482,44 @@ CEntity* CParser::Parse(const char* txt, int length)
         }
     }
     return root;
+}
+CEntity* CParser::ParseFromFile(const char* path)
+{
+    struct SFileCloser
+    {
+        FILE* m_File;
+        SFileCloser(FILE* f)
+        {
+            m_File = f;
+        }
+        ~SFileCloser()
+        {
+            fclose(m_File);
+        }
+    };
+
+    FILE* f = fopen(path, "rb");
+    if (!f)
+    {
+        throw CException("Failed to open file %s", path);
+    }
+
+    SFileCloser file(f); // close the file when leaving this method
+
+    fseek(f, 0, SEEK_END);
+    int size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    std::unique_ptr<char> buf((char*)malloc(size));
+    int rd = fread(buf.get(), 1, size, f);
+    if (rd != size)
+    {
+        throw CException("Failed to read %d bytes from file (read=%d)", size, rd);
+    }
+    return ParseString(buf.get(), size);
+}
+CEntity* CParser::ParseFromFile(const std::string& path)
+{
+    return CParser::ParseFromFile(path.c_str());
 }
 
 } // minijson
