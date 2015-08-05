@@ -73,9 +73,13 @@ public:
     const CArray& Array() const;
     CArray& Array();
     const CNumber& Number() const;
+    CNumber& Number();
     const CString& String() const;
+    CString& String();
     const CBoolean& Boolean() const;
+    CBoolean& Boolean();
     const CNull& Null() const;
+    CNull& Null();
 
     bool IsObject() const;
     bool IsArray() const;
@@ -131,6 +135,12 @@ public:
     CString* AddString(const char* name, const char* value = NULL);
     CBoolean* AddBoolean(const char* name, bool b = false);
     CNull* AddNull(const char* name);
+
+    CNumber* SetInt(const char* name, int i);
+    CNumber* SetFloat(const char* name, float f);
+    CNumber* SetDouble(const char* name, double d);
+    CString* SetString(const char* name, const char* value = NULL);
+    CBoolean* SetBoolean(const char* name, bool value = false);
 
     const std::string& GetString(const char* name, const std::string& defaultValue = s_EmptyString) const { return GetString(std::string(name), defaultValue); }
     const std::string& GetString(const std::string& name, const std::string& defaultValue = s_EmptyString) const;

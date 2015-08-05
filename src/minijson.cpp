@@ -234,6 +234,15 @@ const CString& CEntity::String() const
     }
     return *str;
 }
+CString& CEntity::String()
+{
+    CString* str = dynamic_cast<CString*>(this);
+    if (!str)
+    {
+        throw CException("String() faild for non CString entity");
+    }
+    return *str;
+}
 const CNumber& CEntity::Number() const
 {
     const CNumber* number = dynamic_cast<const CNumber*>(this);
@@ -243,6 +252,16 @@ const CNumber& CEntity::Number() const
     }
     return *number;
 }
+CNumber& CEntity::Number()
+{
+    CNumber* number = dynamic_cast<CNumber*>(this);
+    if (!number)
+    {
+        throw CException("Number() failed for non CNumber entity");
+    }
+    return *number;
+}
+
 const CBoolean& CEntity::Boolean() const
 {
     const CBoolean* boolean = dynamic_cast<const CBoolean*>(this);
@@ -252,9 +271,27 @@ const CBoolean& CEntity::Boolean() const
     }
     return *boolean;
 }
+CBoolean& CEntity::Boolean()
+{
+    CBoolean* boolean = dynamic_cast<CBoolean*>(this);
+    if (!boolean)
+    {
+        throw CException("Boolean() failed for non CBoolean entity");
+    }
+    return *boolean;
+}
 const CNull& CEntity::Null() const
 {
     const CNull* null = dynamic_cast<const CNull*>(this);
+    if (!null)
+    {
+        throw CException("Null() failed for non CNull entity");
+    }
+    return *null;
+}
+CNull& CEntity::Null()
+{
+    CNull* null = dynamic_cast<CNull*>(this);
     if (!null)
     {
         throw CException("Null() failed for non CNull entity");
@@ -810,6 +847,82 @@ CNull* CObject::AddNull(const char* name)
     m_Values[std::string(name)] = null;
     m_MemberNameByIndex.push_back(std::string(name));
     return null;
+}
+CNumber* CObject::SetInt(const char* name, int i)
+{
+    CEntity* ent = GetEntity(name);
+    if (!ent)
+    {
+        return AddInt(name, i);
+    }
+    if (!ent->IsNumber())
+    {
+        Remove(name);
+        return AddInt(name, i);
+    }
+    ent->Number().SetInt(i);
+    return &ent->Number();
+}
+CNumber* CObject::SetFloat(const char* name, float f)
+{
+    CEntity* ent = GetEntity(name);
+    if (!ent)
+    {
+        return AddFloat(name, f);
+    }
+    if (!ent->IsNumber())
+    {
+        Remove(name);
+        return AddFloat(name, f);
+    }
+    ent->Number().SetFloat(f);
+    return &ent->Number();
+}
+CNumber* CObject::SetDouble(const char* name, double d)
+{
+    CEntity* ent = GetEntity(name);
+    if (!ent)
+    {
+        return AddDouble(name, d);
+    }
+    if (!ent->IsNumber())
+    {
+        Remove(name);
+        return AddDouble(name, d);
+    }
+    ent->Number().SetDouble(d);
+    return &ent->Number();
+}
+CString* CObject::SetString(const char* name, const char* value)
+{
+    CEntity* ent = GetEntity(name);
+    if (!ent)
+    {
+        return AddString(name, value);
+    }
+    if (!ent->IsString())
+    {
+        Remove(name);
+        return AddString(name, value);
+    }
+    ent->String().SetString(value);
+    return &ent->String();
+}
+
+CBoolean* CObject::SetBoolean(const char* name, bool b)
+{
+    CEntity* ent = GetEntity(name);
+    if (!ent)
+    {
+        return AddBoolean(name, b);
+    }
+    if (!ent->IsBoolean())
+    {
+        Remove(name);
+        return AddBoolean(name, b);
+    }
+    ent->Boolean().SetBool(b);  
+    return &ent->Boolean();
 }
 CEntity& CObject::EntityAtIndex(int idx)
 {
