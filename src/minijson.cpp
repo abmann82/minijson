@@ -118,6 +118,17 @@ CParseErrorException::CParseErrorException(const char* data, int position, const
 CParseErrorException::~CParseErrorException()
 {
 }
+CIOException::CIOException(const char* txt, ...)
+: CException()
+{
+    char buf[16384];
+    va_list list;
+    va_start(list, txt);
+    MJSONvsprintf(buf, 16384, txt, list);
+    va_end(list);
+
+    m_Message = std::string(buf);
+}
 
 static std::string EscapeString(const std::string& str)
 {
@@ -1501,25 +1512,49 @@ CEntity* CParser::ParseFromFile(const char* path)
     FILE* f = fopen(path, "rb");
     if (!f)
     {
-        throw CException("Failed to open file %s", path);
+        throw CIOException("Failed to open file %s", path);
     }
 
     SFileCloser file(f); // close the file when leaving this method
 
     fseek(f, 0, SEEK_END);
-    int size = ftell(f);
+    int size = (int)ftell(f);
     fseek(f, 0, SEEK_SET);
     std::unique_ptr<char> buf((char*)malloc(size));
-    int rd = fread(buf.get(), 1, size, f);
+    int rd = (int)fread(buf.get(), 1, size, f);
     if (rd != size)
     {
-        throw CException("Failed to read %d bytes from file (read=%d)", size, rd);
+        throw CIOException("Failed to read %d bytes from file (read=%d)", size, rd);
     }
-    return ParseString(buf.get(), size);
+    return ParseString(buf.get(), (int)size);
 }
 CEntity* CParser::ParseFromFile(const std::string& path)
 {
     return CParser::ParseFromFile(path.c_str());
 }
-
+CWriter::CWriter(bool prettyPrint, const std::string& indentation, int level)
+: m_PrettyPrint(true),
+  m_Indentation(indentation),
+  m_Level(level)
+{
+}
+void CWriter::WriteToFile(const char* path, const CEntity& ent)
+{
+    std::string json = ent.ToString(m_PrettyPrint, m_Indentation, m_Level);
+    FILE* f = fopen(path, "wb");
+    if (!f)
+    {
+        throw CIOException("Failed to open file for writing");
+    }
+    size_t wr = fwrite(json.c_str(), 1, json.length(), f);
+    fclose(f);
+    if (wr != json.length())
+    {
+        throw CIOException("Failed to write all bytes to file");
+    }
+}
+void CWriter::WriteToFile(const std::string& path, const CEntity& ent)
+{
+    WriteToFile(path.c_str(), ent);
+}
 } // minijson

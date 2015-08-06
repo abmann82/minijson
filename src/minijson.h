@@ -60,6 +60,11 @@ private:
     int m_Column;
     std::string m_Surrounding; // if possible: 2 lines before error ; error line ; 'marker' line ; 2 lines after error
 };
+class CIOException : public CException
+{
+public:
+    CIOException(const char* txt, ...) __attribute__((format(printf, 2, 3)));
+};
 
 class CEntity
 {
@@ -330,6 +335,17 @@ private:
     int m_Length;
     const char* m_Text;
 };
+class CWriter
+{
+public:
+    CWriter(bool prettyPrint = true, const std::string& indentation = std::string("  "), int level = 0);
 
+    void WriteToFile(const char* path, const CEntity& ent);
+    void WriteToFile(const std::string& path, const CEntity& ent);
+private:
+    bool m_PrettyPrint;
+    std::string m_Indentation;
+    int m_Level;
+};
 
 } // minijson
