@@ -1,3 +1,5 @@
+#ifndef MINIJSON_H
+#define MINIJSON_H
 #include <string>
 #include <map>
 #include <vector>
@@ -349,3 +351,5 @@ private:
 };
 
 } // minijson
+
+#endif
