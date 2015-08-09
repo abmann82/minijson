@@ -1472,25 +1472,28 @@ CEntity* CParser::Parse(const char* txt, int length)
         m_Length = length;
     }
     CEntity* root = NULL;
-    while (m_Position < m_Length)
+    SkipWhitespaces();
+    if (m_Position == m_Length)
     {
-        SkipWhitespaces();
-        if (m_Position == m_Length)
-        {
-            break;
-        }
-        if (TryToConsume("["))
-        {
-            root = ParseArray();
-        }
-        else if (TryToConsume("{"))
-        {
-            root = ParseObject();
-        }
-        else
-        {
-            throw CParseErrorException(m_Text, m_Position, "Syntax error");
-        }
+        throw CParseErrorException(m_Text, m_Position, "Empty input");
+    }
+    if (TryToConsume("["))
+    {
+        root = ParseArray();
+    }
+    else if (TryToConsume("{"))
+    {
+        root = ParseObject();
+    }
+    else
+    {
+        delete root;
+        throw CParseErrorException(m_Text, m_Position, "Syntax error");
+    }
+    SkipWhitespaces();
+    if (m_Position != m_Length)
+    {
+        throw CParseErrorException(m_Text, m_Position, "Extra bytes at end of json");
     }
     return root;
 }
