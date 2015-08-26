@@ -1523,13 +1523,16 @@ CEntity* CParser::ParseFromFile(const char* path)
     fseek(f, 0, SEEK_END);
     int size = (int)ftell(f);
     fseek(f, 0, SEEK_SET);
-    std::unique_ptr<char> buf((char*)malloc(size));
-    int rd = (int)fread(buf.get(), 1, size, f);
+    char* buf = (char*)malloc(size);
+    int rd = (int)fread(buf, 1, size, f);
     if (rd != size)
     {
+        free(buf);
         throw CIOException("Failed to read %d bytes from file (read=%d)", size, rd);
     }
-    return ParseString(buf.get(), (int)size);
+    CEntity* ent = ParseString(buf, (int)size);
+    free(buf);
+    return ent;
 }
 CEntity* CParser::ParseFromFile(const std::string& path)
 {
