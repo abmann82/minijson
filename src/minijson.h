@@ -169,7 +169,7 @@ public:
     CNull* GetNull(const std::string& name) const;
     CEntity* GetEntity(const std::string& name) const;
 
-    const std::string& MemberNameByIndex(int index) const { return m_MemberNameByIndex[index]; }
+    const std::string& MemberNameByIndex(int index) const;
 
     virtual int Count() const MINIJSON_OVERRIDE { return (int)m_Values.size(); }
     CEntity& EntityAtIndex(int idx);

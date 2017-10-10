@@ -250,7 +250,7 @@ CString& CEntity::String()
     CString* str = dynamic_cast<CString*>(this);
     if (!str)
     {
-        throw CException("String() faild for non CString entity");
+        throw CException("String() failed for non CString entity");
     }
     return *str;
 }
@@ -320,7 +320,7 @@ const std::string& CEntity::ObjectMemberNameByIndex(int index) const
 
 int CEntity::Count() const
 {
-    throw CException("Count is not applicapable for this type");
+    throw CException("Count is not applicable for this type");
 }
 const std::string& CEntity::StringValue() const
 {
@@ -368,7 +368,13 @@ const CEntity& CEntity::operator[] (const char* key) const
     {
         throw CException("operator[](key) is only allowed for objects");
     }
-    return *Object().GetEntity(key);
+    const CEntity* ent = Object().GetEntity(key);
+    if (!ent)
+    {
+        // TODO: specialized CKeyNotFoundException? (provide key as argument)
+        throw CException("key '%s' not found in operator[]", key);
+    }
+    return *ent;
 }
 const CEntity& CEntity::operator[] (const std::string& key) const
 {
@@ -376,7 +382,13 @@ const CEntity& CEntity::operator[] (const std::string& key) const
     {
         throw CException("operator[](key) is only allowed for objects");
     }
-    return *Object().GetEntity(key);
+    const CEntity* ent = Object().GetEntity(key);
+    if (!ent)
+    {
+        // TODO: specialized CKeyNotFoundException? (provide key as argument)
+        throw CException("key '%s' not found in operator[]", key.c_str());
+    }
+    return *ent;
 }
 
 CEntity& CEntity::operator[] (int idx)
@@ -400,7 +412,13 @@ CEntity& CEntity::operator[] (const char* key)
     {
         throw CException("operator[](key) is only allowed for objects");
     }
-    return *Object().GetEntity(key);
+    CEntity* ent = Object().GetEntity(key);
+    if (!ent)
+    {
+        // TODO: specialized CKeyNotFoundException? (provide key as argument)
+        throw CException("key '%s' not found in operator[]", key);
+    }
+    return *ent;
 }
 CEntity& CEntity::operator[] (const std::string& key)
 {
@@ -408,7 +426,13 @@ CEntity& CEntity::operator[] (const std::string& key)
     {
         throw CException("operator[](key) is only allowed for objects");
     }
-    return *Object().GetEntity(key);
+    CEntity* ent = Object().GetEntity(key);
+    if (!ent)
+    {
+        // TODO: specialized CKeyNotFoundException? (provide key as argument)
+        throw CException("key '%s' not found in operator[]", key.c_str());
+    }
+    return *ent;
 }
 
 CNumber::CNumber()
@@ -544,7 +568,7 @@ CArray::~CArray()
 void CArray::Remove(int index)
 {
     if (index < 0 ||
-        index >= (int)m_Values.size())
+        (size_t)index >= m_Values.size())
     {
         throw CException("index out of range");
     }
@@ -736,10 +760,20 @@ CNull* CArray::GetNull(int index) const
 }
 CEntity& CArray::EntityAtIndex(int index)
 {
+    if (index < 0 || (size_t)index >= m_Values.size())
+    {
+        // TODO: specialized CIndexOutOfBoundsException?
+        throw CException("index %d out of bounds for EntityAtIndex()", index);
+    }
     return *m_Values[index];
 }
 const CEntity& CArray::EntityAtIndex(int index) const
 {
+    if (index < 0 || (size_t)index >= m_Values.size())
+    {
+        // TODO: specialized CIndexOutOfBoundsException?
+        throw CException("index %d out of bounds for EntityAtIndex()", index);
+    }
     return *m_Values[index];
 }
 
@@ -944,15 +978,34 @@ CBoolean* CObject::SetBoolean(const char* name, bool b)
         Remove(name);
         return AddBoolean(name, b);
     }
-    ent->Boolean().SetBool(b);  
+    ent->Boolean().SetBool(b);
     return &ent->Boolean();
+}
+const std::string& CObject::MemberNameByIndex(int index) const
+{
+    if (index < 0 || (size_t)index >= m_Values.size())
+    {
+        // TODO: specialized CIndexOutOfBoundsException?
+        throw CException("index %d out of bounds for MemberNameByIndex()", index);
+    }
+    return m_MemberNameByIndex[index];
 }
 CEntity& CObject::EntityAtIndex(int idx)
 {
+    if (idx < 0 || (size_t)idx >= m_MemberNameByIndex.size())
+    {
+        // TODO: specialized CIndexOutOfBoundsException?
+        throw CException("index %d out of bounds for EntityAtIndex()", idx);
+    }
     return *m_Values[m_MemberNameByIndex[idx]];
 }
 const CEntity& CObject::EntityAtIndex(int idx) const
 {
+    if (idx < 0 || (size_t)idx >= m_MemberNameByIndex.size())
+    {
+        // TODO: specialized CIndexOutOfBoundsException?
+        throw CException("index %d out of bounds for EntityAtIndex()", idx);
+    }
     std::string key = m_MemberNameByIndex[idx];
     return *m_Values.find(key)->second;
 }
@@ -1420,7 +1473,7 @@ CObject* CParser::ParseObject()
 
         obj->m_Values[key] = ent;
         obj->m_MemberNameByIndex.push_back(key);
-        
+
         SkipWhitespaces();
         if (!TryToConsume(","))
         {
