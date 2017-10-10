@@ -336,7 +336,7 @@ int CEntity::IntValue() const
 }
 float CEntity::FloatValue() const
 {
-    return DoubleValue();
+    return (float)DoubleValue();
 }
 double CEntity::DoubleValue() const
 {
