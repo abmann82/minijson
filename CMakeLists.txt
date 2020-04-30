@@ -11,6 +11,10 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 add_executable(minijsonvalidate tools/minijsonvalidatemain.cpp)
 target_link_libraries(minijsonvalidate minijson)
 
+# optional tool: beautifyer using minijson
+add_executable(minijsonbeautify tools/minijsonbeautifymain.cpp)
+target_link_libraries(minijsonbeautify minijson)
+
 # optional minijson unittests, requires google test
 # to build, download and extract google test (version 1.7.0 is known to work) and re-run cmake.
 if (EXISTS "${CMAKE_SOURCE_DIR}/gtest/src/gtest-all.cc")
