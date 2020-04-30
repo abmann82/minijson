@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <algorithm>
 
-
 #ifndef _WIN32
 #define MJSONvsprintf(str, size, format, args) vsnprintf(str, size, format, args)
 #else // !_WIN32
@@ -132,7 +131,7 @@ CIOException::CIOException(const char* txt, ...)
 
 static std::string EscapeString(const std::string& str)
 {
-    int escapeCount = 0;
+    size_t escapeCount = 0;
     for (std::string::size_type i = 0; i < str.length(); i++)
     {
         char c = str[i];
@@ -559,7 +558,7 @@ CArray::CArray()
 }
 CArray::~CArray()
 {
-    for (int i = 0; i < (int)m_Values.size(); i++)
+    for (size_t i = 0; i < m_Values.size(); i++)
     {
         delete m_Values[i];
     }
@@ -572,7 +571,7 @@ void CArray::Remove(int index)
     {
         throw CException("index out of range");
     }
-    CEntity* ent = m_Values[index];
+    CEntity* ent = m_Values[(size_t)index];
     delete ent;
     m_Values.erase(m_Values.begin() + index);
 }
@@ -643,7 +642,7 @@ std::string CArray::ToString(bool prettyPrint, const std::string& indentation, i
 {
     std::string s;
     s += "[";
-    for (int i = 0; i < (int)m_Values.size(); i++)
+    for (size_t i = 0; i < m_Values.size(); i++)
     {
         if (i != 0)
         {
@@ -656,7 +655,7 @@ std::string CArray::ToString(bool prettyPrint, const std::string& indentation, i
 }
 const std::string& CArray::GetString(int index, const std::string& defaultValue) const
 {
-    if (index < 0 || index >= Count() || !m_Values[index] || !m_Values[index]->IsString())
+    if (index < 0 || index >= Count() || !m_Values[(size_t)index] || !m_Values[(size_t)index]->IsString())
     {
         return defaultValue;
     }
@@ -1597,20 +1596,24 @@ CWriter::CWriter(bool prettyPrint, const std::string& indentation, int level)
   m_Level(level)
 {
 }
-void CWriter::WriteToFile(const char* path, const CEntity& ent)
+void CWriter::WriteToFile(FILE* f, const CEntity& ent)
 {
     std::string json = ent.ToString(m_PrettyPrint, m_Indentation, m_Level);
-    FILE* f = fopen(path, "wb");
-    if (!f)
-    {
-        throw CIOException("Failed to open file for writing");
-    }
     size_t wr = fwrite(json.c_str(), 1, json.length(), f);
     fclose(f);
     if (wr != json.length())
     {
         throw CIOException("Failed to write all bytes to file");
     }
+}
+void CWriter::WriteToFile(const char* path, const CEntity& ent)
+{
+    FILE* f = fopen(path, "wb");
+    if (!f)
+    {
+        throw CIOException("Failed to open file for writing");
+    }
+    WriteToFile(f, ent);
 }
 void CWriter::WriteToFile(const std::string& path, const CEntity& ent)
 {

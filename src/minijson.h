@@ -342,8 +342,10 @@ class CWriter
 public:
     CWriter(bool prettyPrint = true, const std::string& indentation = std::string("  "), int level = 0);
 
+    void WriteToFile(FILE* file, const CEntity& ent);
     void WriteToFile(const char* path, const CEntity& ent);
     void WriteToFile(const std::string& path, const CEntity& ent);
+
 private:
     bool m_PrettyPrint;
     std::string m_Indentation;
